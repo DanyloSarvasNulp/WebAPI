@@ -2,7 +2,7 @@
 
 namespace WebAPI.Entities.Models
 {
-    public class Contact
+    public class Contact : IEntity
     {
         public List<Account> Accounts { get; set; }
 

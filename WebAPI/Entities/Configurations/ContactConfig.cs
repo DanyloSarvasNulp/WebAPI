@@ -19,10 +19,12 @@ namespace WebAPI.Entities.Configurations
                 .IsRequired();
 
             builder
+                .HasIndex(c => c.Email)
+                .IsUnique();
+            builder
                 .Property(c => c.Email)
                 .IsRequired();
 
-            
             builder
                 .HasMany(c => c.Accounts)
                 .WithOne(a => a.Contact);

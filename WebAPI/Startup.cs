@@ -12,7 +12,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WebAPI.Configurations;
 using WebAPI.Entities;
+using WebAPI.Repository;
+using WebAPI.Repository.Interfaces;
 
 namespace WebAPI
 {
@@ -31,6 +34,7 @@ namespace WebAPI
             services.AddDbContext<WebApiDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
+            services.AddDataProvider();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "WebAPI", Version = "v1"}); });
         }
 
