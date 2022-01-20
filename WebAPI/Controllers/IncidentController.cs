@@ -97,9 +97,13 @@ namespace WebAPI.Controllers
         
         
         [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var incident = await _incidentDbSet.FindAsync(id);
+            var incident = await _incidentDbSet
+                .SingleOrDefaultAsync(i => i.Name == id);
+
+            if (incident == null) return NotFound();
+            
             _incidentDbSet.Remove(incident);
             await _context.SaveChangesAsync();
             
