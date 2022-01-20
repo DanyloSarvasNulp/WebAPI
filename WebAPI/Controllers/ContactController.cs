@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Entities;
 using WebAPI.Entities.Models;
 using WebAPI.Repository.Interfaces;
 
@@ -20,8 +18,11 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public void Post(string firstName, string lastName, string email)
+        public IActionResult Post(string firstName, string lastName, string email)
         {
+            var duplicateEmail = _contact.FindDuplicateEmail(email);
+            if (duplicateEmail != null) return Conflict();
+            
             var contact = new Contact
             {
                 FirstName = firstName,
@@ -31,6 +32,7 @@ namespace WebAPI.Controllers
 
             _contact.Create(contact);
             _contact.Save();
+            return Ok();
         }
 
         [HttpGet]
@@ -49,11 +51,14 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete]
-        public async void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var contact = _contact.GetById(id);
-            _contact.Delete(contact.Result);
+            var contact = await _contact.GetById(id);
+            if (contact == null) return NotFound();
+            
+            _contact.Delete(contact);
             _contact.Save();
+            return Ok();
         }
     }
 }

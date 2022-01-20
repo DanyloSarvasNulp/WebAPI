@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WebAPI.Entities.Models;
 
@@ -12,7 +13,7 @@ namespace WebAPI.Entities.Configurations
             // builder
             //     .Property(i => i.Name)
             //     .HasDefaultValueSql("newsequentialid()");
-            
+
             builder
                 .Property(i => i.Name)
                 .HasDefaultValueSql("NEWID()");    

@@ -9,6 +9,7 @@ namespace WebAPI.Configurations
         public static void AddDataProvider(this IServiceCollection services)
         {
             services.AddTransient<IContactRepository, ContactRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
         }
     }
 }

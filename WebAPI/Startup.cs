@@ -33,6 +33,7 @@ namespace WebAPI
         {
             services.AddDbContext<WebApiDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // services.AddTransient<WebApiDbContext>();
             services.AddControllers();
             services.AddDataProvider();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "WebAPI", Version = "v1"}); });

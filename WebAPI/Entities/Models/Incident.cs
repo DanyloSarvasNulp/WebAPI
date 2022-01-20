@@ -5,7 +5,7 @@ namespace WebAPI.Entities.Models
 {
     public class Incident
     {
-        public Account Account { get; set; }
+        public virtual Account Account { get; set; }
         public int AccountId { get; set; }
         
         // кастиль, ібо я не знаю як в fluent api

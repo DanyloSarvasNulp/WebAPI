@@ -13,7 +13,7 @@ namespace WebAPI.Repository
         
         private readonly DbSet<T> _dbSet;
 
-        protected GenericRepository(WebApiDbContext context)
+        protected GenericRepository (WebApiDbContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();
