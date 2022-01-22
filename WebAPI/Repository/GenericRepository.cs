@@ -13,7 +13,7 @@ namespace WebAPI.Repository
         
         private readonly DbSet<T> _dbSet;
 
-        protected GenericRepository (WebApiDbContext context)
+        public GenericRepository (WebApiDbContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();
@@ -42,11 +42,6 @@ namespace WebAPI.Repository
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
-        }
-
-        public void Save()
-        {
-            _context.SaveChanges();
         }
     }
 }

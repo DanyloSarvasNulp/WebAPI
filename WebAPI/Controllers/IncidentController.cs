@@ -15,18 +15,11 @@ namespace WebAPI.Controllers
     [Route("[controller]")]
     public class IncidentController : ControllerBase
     {
-        private readonly IIncidentRepository _incident;
-        private readonly IAccountRepository _account;
-        private readonly IContactRepository _contact;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public IncidentController (
-            IIncidentRepository incident,
-            IAccountRepository account,
-            IContactRepository contact)
+        public IncidentController (IUnitOfWork unitOfWork)
         {
-            _incident = incident;
-            _account = account;
-            _contact = contact;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost]
@@ -39,10 +32,10 @@ namespace WebAPI.Controllers
             
             var incident = new Incident();
 
-            var account = await _account.FindByName(accountName);
+            var account = await _unitOfWork.Accounts.FindByName(accountName);
             if (account == null) return NotFound();
 
-            var contact = await _contact.FindByEmail(contactEmail);
+            var contact = await _unitOfWork.Contacts.FindByEmail(contactEmail);
             
             if (contact != null)
             {
@@ -71,15 +64,15 @@ namespace WebAPI.Controllers
                 incident.Description = incidentDescription;
             }
 
-            _incident.Create(incident);
-            _incident.Save();
+            _unitOfWork.Incidents.Create(incident);
+            _unitOfWork.Save();
             return Ok();
         }
 
         [HttpGet]
         public async Task<Incident> Get(string name)
         {
-            var incident = await _incident.GetByName(name);
+            var incident = await _unitOfWork.Incidents.GetByName(name);
             return incident;
         }
         
@@ -87,18 +80,18 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<List<Incident>> GetAll()
         {
-            return await _incident.GetAll();
+            return await _unitOfWork.Incidents.GetAll();
         }
         
         
         [HttpDelete]
         public async Task<IActionResult> Delete(string name)
         {
-            var incident = await _incident.GetByName(name);
+            var incident = await _unitOfWork.Incidents.GetByName(name);
             if (incident == null) return NotFound();
             
-            _incident.Delete(incident);
-            _incident.Save();
+            _unitOfWork.Incidents.Delete(incident);
+            _unitOfWork.Save();
             return Ok();
         }
     }

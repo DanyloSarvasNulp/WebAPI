@@ -13,7 +13,7 @@ namespace WebAPI.Repository
         
         private readonly DbSet<Incident> _dbSet;
 
-        protected IncidentRepository (WebApiDbContext context)
+        public IncidentRepository (WebApiDbContext context)
         {
             _context = context;
             _dbSet = context.Set<Incident>();
@@ -42,11 +42,6 @@ namespace WebAPI.Repository
         public void Delete(Incident entity)
         {
             _dbSet.Remove(entity);
-        }
-
-        public void Save()
-        {
-            _context.SaveChanges();
         }
     }
 }

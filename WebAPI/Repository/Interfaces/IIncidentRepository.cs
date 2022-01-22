@@ -11,6 +11,5 @@ namespace WebAPI.Repository.Interfaces
         void Create(Incident entity);
         void Update(Incident entity);
         void Delete(Incident entity);
-        void Save();
     }
 }

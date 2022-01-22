@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Entities.Models;
+using WebAPI.Repository;
 using WebAPI.Repository.Interfaces;
 
 namespace WebAPI.Controllers
@@ -10,17 +11,17 @@ namespace WebAPI.Controllers
     [Route("[controller]")]
     public class ContactController : ControllerBase
     {
-        private readonly IContactRepository _contact;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ContactController (IContactRepository contact)
+        public ContactController (IUnitOfWork unitOfWork)
         {
-            _contact = contact;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(string firstName, string lastName, string email)
         {
-            var duplicateContact = await _contact.FindByEmail(email);
+            var duplicateContact = await _unitOfWork.Contacts.FindByEmail(email);
             if (duplicateContact != null) return Conflict();
             
             var contact = new Contact
@@ -30,15 +31,15 @@ namespace WebAPI.Controllers
                 Email = email
             };
 
-            _contact.Create(contact);
-            _contact.Save();
+            _unitOfWork.Contacts.Create(contact);
+            _unitOfWork.Save();
             return Ok();
         }
 
         [HttpGet]
         public async Task<Contact> Get(int id)
         {
-            var contact = await _contact.GetById(id);
+            var contact = await _unitOfWork.Contacts.GetById(id);
             return contact;
         }
         
@@ -46,18 +47,18 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<List<Contact>> GetAll()
         {
-            var contacts = await _contact.GetAll();
+            var contacts = await _unitOfWork.Contacts.GetAll();
             return contacts;
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var contact = await _contact.GetById(id);
+            var contact = await _unitOfWork.Contacts.GetById(id);
             if (contact == null) return NotFound();
             
-            _contact.Delete(contact);
-            _contact.Save();
+            _unitOfWork.Contacts.Delete(contact);
+            _unitOfWork.Save();
             return Ok();
         }
     }

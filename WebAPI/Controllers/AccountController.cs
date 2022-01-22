@@ -12,24 +12,22 @@ namespace WebAPI.Controllers
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountRepository _account;
-        private readonly IContactRepository _contact;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(
-            IAccountRepository account, 
-            IContactRepository contact)
+
+        public AccountController(IUnitOfWork unitOfWork)
         {
-            _account = account;
-            _contact = contact;
+            _unitOfWork = unitOfWork;
+
         }
         
         [HttpPost]
         public async Task<IActionResult> Post(int contactId, string name)
         {
-            var duplicateAccount = await _account.FindByName(name);
+            var duplicateAccount = await _unitOfWork.Accounts.FindByName(name);
             if (duplicateAccount != null) return Conflict();
 
-            var contact = await _contact.GetById(contactId);
+            var contact = await _unitOfWork.Contacts.GetById(contactId);
             if (contact == null) return NotFound();
             
             var account = new Account
@@ -38,15 +36,15 @@ namespace WebAPI.Controllers
                 ContactId = contactId,
             };
             
-            _account.Create(account);
-            _account.Save();
+            _unitOfWork.Accounts.Create(account);
+            _unitOfWork.Save();
             return Ok();
         }
 
         [HttpGet]
         public async Task<Account> Get(int id)
         {
-            var account = await _account.GetById(id);
+            var account = await _unitOfWork.Accounts.GetById(id);
             return account;
         }
         
@@ -54,18 +52,18 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<List<Account>> GetAll()
         {
-            var accounts = await _account.GetAll();
+            var accounts = await _unitOfWork.Accounts.GetAll();
             return accounts;
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var account = await _account.GetById(id);
+            var account = await _unitOfWork.Accounts.GetById(id);
             if (account == null) return NotFound();
             
-            _account.Delete(account);
-            _account.Save();
+            _unitOfWork.Accounts.Delete(account);
+            _unitOfWork.Save();
             return Ok();
         }
     }
