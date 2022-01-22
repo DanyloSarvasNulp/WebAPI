@@ -6,6 +6,6 @@ namespace WebAPI.Repository.Interfaces
 {
     public interface IAccountRepository : IGenericRepository<Account>
     {
-        Task<Account> FindDuplicateName(string name);
+        Task<Account> FindByName(string name);
     }
 }

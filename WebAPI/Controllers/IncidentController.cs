@@ -7,26 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Entities;
 using WebAPI.Entities.Models;
+using WebAPI.Repository.Interfaces;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Microsoft.AspNetCore.Mvc.Route("[controller]")]
+    [Route("[controller]")]
     public class IncidentController : ControllerBase
     {
-        // я не можу використовувати патерн репозиторії, бо incident не має
-        // поля int Id. Кастилі, аля умовний primary key Id, робити не хочеться
-        private readonly WebApiDbContext _context;
-        private readonly DbSet<Account> _accountDbSet;
-        private readonly DbSet<Incident> _incidentDbSet;
-        private readonly DbSet<Contact> _contactDbSet;
+        private readonly IIncidentRepository _incident;
+        private readonly IAccountRepository _account;
+        private readonly IContactRepository _contact;
 
-        public IncidentController (WebApiDbContext context)
+        public IncidentController (
+            IIncidentRepository incident,
+            IAccountRepository account,
+            IContactRepository contact)
         {
-            _context = context;
-            _incidentDbSet = context.Set<Incident>();
-            _accountDbSet = context.Set<Account>();
-            _contactDbSet = context.Set<Contact>();
+            _incident = incident;
+            _account = account;
+            _contact = contact;
         }
 
         [HttpPost]
@@ -38,53 +38,48 @@ namespace WebAPI.Controllers
         {
             
             var incident = new Incident();
-            
-            var account = await _accountDbSet
-                .SingleOrDefaultAsync(a => a.Name == accountName);
-            
+
+            var account = await _account.FindByName(accountName);
             if (account == null) return NotFound();
 
-            var preCreatedContact = await _contactDbSet
-                .SingleOrDefaultAsync(c => c.Email == contactEmail);
-            account.Contact = preCreatedContact;
-            if (preCreatedContact != null)
+            var contact = await _contact.FindByEmail(contactEmail);
+            
+            if (contact != null)
             {
-                account.Contact.FirstName = firstName;
-                account.Contact.LastName = lastName;
-
-                incident.Account = account;
+                contact.FirstName = firstName;
+                contact.LastName = lastName;
+                
                 incident.AccountId = account.Id;
                 incident.Description = incidentDescription;
             }
 
             else
             {
-                var contact = new Contact()
+                var newContact = new Contact
                 {
                     FirstName = firstName,
                     LastName = lastName,
                     Email = contactEmail,
-                    Accounts = new List<Account>(){account}
+                    Accounts = new List<Account> {account}
                 };
 
-                account.Contact = contact;
-                account.ContactId = contact.Id;
+                account.Contact = newContact;
+                account.ContactId = newContact.Id;
 
                 incident.Account = account;
                 incident.AccountId = account.Id;
                 incident.Description = incidentDescription;
             }
 
-            _incidentDbSet.Add(incident);
-            await _context.SaveChangesAsync();
+            _incident.Create(incident);
+            _incident.Save();
             return Ok();
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet]
-        public Incident Get(string name)
+        [HttpGet]
+        public async Task<Incident> Get(string name)
         {
-            var incident = _incidentDbSet
-                .SingleOrDefault(i => i.Name == name);
+            var incident = await _incident.GetByName(name);
             return incident;
         }
         
@@ -92,21 +87,18 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<List<Incident>> GetAll()
         {
-            return await _incidentDbSet.ToListAsync();
+            return await _incident.GetAll();
         }
         
         
         [HttpDelete]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(string name)
         {
-            var incident = await _incidentDbSet
-                .SingleOrDefaultAsync(i => i.Name == id);
-
+            var incident = await _incident.GetByName(name);
             if (incident == null) return NotFound();
             
-            _incidentDbSet.Remove(incident);
-            await _context.SaveChangesAsync();
-            
+            _incident.Delete(incident);
+            _incident.Save();
             return Ok();
         }
     }

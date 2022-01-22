@@ -20,7 +20,8 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(string firstName, string lastName, string email)
         {
-            if (await _contact.IsThereEmailDuplicate(email)) return Conflict();
+            var duplicateContact = await _contact.FindByEmail(email);
+            if (duplicateContact != null) return Conflict();
             
             var contact = new Contact
             {

@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(int contactId, string name)
         {
-            var duplicateAccount = await _account.FindDuplicateName(name);
+            var duplicateAccount = await _account.FindByName(name);
             if (duplicateAccount != null) return Conflict();
 
             var contact = await _contact.GetById(contactId);
@@ -36,11 +36,9 @@ namespace WebAPI.Controllers
             {
                 Name = name,
                 ContactId = contactId,
-                Contact = contact
             };
             
             _account.Create(account);
-            
             _account.Save();
             return Ok();
         }
@@ -64,6 +62,8 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var account = await _account.GetById(id);
+            if (account == null) return NotFound();
+            
             _account.Delete(account);
             _account.Save();
             return Ok();

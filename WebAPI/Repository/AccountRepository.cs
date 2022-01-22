@@ -14,12 +14,11 @@ namespace WebAPI.Repository
 
         }
         
-        public async Task<Account> FindDuplicateName(string name)
+        public async Task<Account> FindByName(string name)
         {
             var accounts = await GetAll();
-            var duplicateAccounts = accounts.SingleOrDefault(a => a.Name == name);
-            if (duplicateAccounts == null) return null;
-            return duplicateAccounts;
+            var duplicateAccount = accounts.SingleOrDefault(a => a.Name == name);
+            return duplicateAccount;
         }
     }
 }

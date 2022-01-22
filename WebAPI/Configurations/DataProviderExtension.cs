@@ -10,6 +10,8 @@ namespace WebAPI.Configurations
         {
             services.AddTransient<IContactRepository, ContactRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<IIncidentRepository, IncidentRepository>();
+
         }
     }
 }
