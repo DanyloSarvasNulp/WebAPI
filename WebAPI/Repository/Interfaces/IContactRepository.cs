@@ -5,6 +5,6 @@ namespace WebAPI.Repository.Interfaces
 {
     public interface IContactRepository : IGenericRepository<Contact>
     {
-        Task<Contact> FindDuplicateEmail(string name);
+        Task<bool> IsThereEmailDuplicate(string name);
     }
 }

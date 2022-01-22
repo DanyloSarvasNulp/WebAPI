@@ -13,12 +13,11 @@ namespace WebAPI.Repository
             
         }
         
-        public async Task<Contact> FindDuplicateEmail(string email)
+        public async Task<bool> IsThereEmailDuplicate(string email)
         {
             var contacts = await GetAll();
             var duplicateContacts = contacts.SingleOrDefault(c => c.Email == email);
-            if (duplicateContacts == null) return null;
-            return duplicateContacts;
+            return duplicateContacts != null;
         }
     }
 }
